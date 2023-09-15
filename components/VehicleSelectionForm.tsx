@@ -13,23 +13,8 @@ import {
   FormControl,
   Card,
 } from "react-bootstrap";
-
-const MODELS = {
-  ford: {
-    Ranger: ["Raptor", "Raptor x", "Wildtrak"],
-    Falcon: ["XR6", "XR6 Turbo", "XR8"],
-    "Falcon Ute": ["XR6", "XR6 Turbo"],
-  },
-  bmw: {
-    "130d": ["xDrive 26d", "xDrive 30d"],
-    "240i": ["xDrive 30d", "xDrive 50d"],
-    "320e": ["xDrive 75d", "xDrive 80d", "xDrive 85d"],
-  },
-  tesla: {
-    "Model 3": ["Performance", "Long Range", "Dual Motor"],
-  },
-};
-
+import Vehicles from "@/model/Vehicles";
+ 
 interface VehicleSelectionFormProps {
   onVehicleSelect: (
     make: string,
@@ -100,10 +85,10 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
                   onChange={(event) => {
                     handleMakeChange(event.target.value);
                   }}
-                  value={make}
+                  value={make || ""}
                 >
                   <option value="">-- Select Make --</option>
-                  {Object.keys(MODELS).map((make) => (
+                  {Object.keys(Vehicles).map((make) => (
                     <option key={make} value={make}>
                       {make}
                     </option>
@@ -118,10 +103,10 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
                     onChange={(event) => {
                       handleModelChange(event.target.value);
                     }}
-                    value={model}
+                    value={model || ""}
                   >
                     <option value="">-- Select Model --</option>
-                    {Object.keys(MODELS[make]).map((model) => (
+                    {Object.keys(Vehicles[make]).map((model) => (
                       <option key={model} value={model}>
                         {model}
                       </option>
@@ -137,10 +122,10 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
                     onChange={(event) => {
                       handleVariantChange(event.target.value);
                     }}
-                    value={variant}
+                    value={variant || ""}
                   >
                     <option value="">-- Select Variant --</option>
-                    {MODELS[make][model].map((variant) => (
+                    {Vehicles[make || ""][model].map((variant : string) => (
                       <option key={variant} value={variant}>
                         {variant}
                       </option>
