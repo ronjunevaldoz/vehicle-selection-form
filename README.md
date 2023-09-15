@@ -1,5 +1,7 @@
 ## Vehicle Selector Form 
-
+## Reason why i've choose NextJS?
+- NextJs can handle both Server & Client side page and API hosting
+- Single codebase
 ## Exam notes for improvement (Ron June Valdoz)
 - use [Formik](https://formik.org/) for better validation
 - use [Redux toolkit](https://redux-toolkit.js.org/) for better readability & maintenance 
