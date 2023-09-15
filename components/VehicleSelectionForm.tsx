@@ -1,20 +1,10 @@
-// components/VehicleSelectionForm.tsx
-"use client"; // This is a client component 👈🏽
-
-import React, { useEffect, useRef, useState } from "react";
-import LogBookUploader from "./LogBookUploader"; // Import the LogBookUploader component
+import React, { useEffect, useState } from "react";
+import LogBookUploader from "./LogBookUploader";
 import VehicleSelector from "./VehicleSelector";
-import {
-  Row,
-  Col,
-  FormGroup,
-  FormLabel,
-  Form,
-  FormControl,
-  Card,
-} from "react-bootstrap";
+import { Row, Col, Card, Form, FormGroup, FormLabel } from "react-bootstrap";
+import { useFormik } from "formik"; // Import Formik components
 import Vehicles from "@/model/Vehicles";
- 
+
 interface VehicleSelectionFormProps {
   onVehicleSelect: (
     make: string,
@@ -27,49 +17,35 @@ interface VehicleSelectionFormProps {
 const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
   onVehicleSelect,
 }) => {
-  const [make, setMake] = useState<string | null>(null);
-  const [model, setModel] = useState<string | null>(null);
-  const [variant, setVariant] = useState<string | null>(null);
-  const [showUploadForm, setShowUploadForm] = useState<boolean>(false); // Added upload form visibility state
+  const [showUploadForm, setShowUploadForm] = useState<boolean>(false);
 
-  const makeRef = useRef<HTMLSelectElement | null>(null);
-  const modelRef = useRef<HTMLSelectElement | null>(null);
-  const variantRef = useRef<HTMLSelectElement | null>(null);
-
-  const handleMakeChange = (value: string) => {
-    setMake(value);
-    setModel(null);
-    setVariant(null);
-    setShowUploadForm(false); // Hide upload form when make is changed
+  const initialValues = {
+    make: null,
+    model: null,
+    variant: null,
+    file: null,
   };
 
-  const handleModelChange = (value: string) => {
-    setModel(value);
-    setVariant(null);
-    setShowUploadForm(false); // Hide upload form when model is changed
-  };
-
-  const handleVariantChange = (value: string) => {
-    setVariant(value);
-    if (make && model && variant) {
-      onVehicleSelect(make, model, variant, null);
-    }
-  };
-
-  const handleUpload = (file: File) => {
-    if (make && model && variant && file) {
-      onVehicleSelect(make, model, variant, file);
-      // You can also handle file upload here, e.g., send it to a server.
-    }
-  };
+  const formik = useFormik({
+    initialValues: initialValues,
+    onSubmit: (values) => {
+      const { make, model, variant, file } = values;
+      if (make && model && variant && file) {
+        onVehicleSelect(make, model, variant, file);
+      }
+    },
+  });
 
   useEffect(() => {
-    if (make && model && variant) {
-      setShowUploadForm(true); // Show upload form when all fields are filled up
-    } else {
-      setShowUploadForm(false);
+    const values = formik.values;
+    if (values) {
+      if (values.make && values.model && values.variant) {
+        setShowUploadForm(true);
+      } else {
+        setShowUploadForm(false);
+      }
     }
-  }, [make, model, variant]);
+  }, [formik.values]);
 
   return (
     <Card>
@@ -77,15 +53,17 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
         <Row className="justify-content-md-center">
           <Col>
             <h2>Vehicle Selection Form</h2>
-            <Form>
+            <Form onSubmit={formik.handleSubmit}>
               <FormGroup>
                 <FormLabel>Select Make:</FormLabel>
                 <Form.Select
-                  as="select"
-                  onChange={(event) => {
-                    handleMakeChange(event.target.value);
+                  name="make"
+                  className="form-control"
+                  onChange={(e) => {
+                    formik.setFieldValue("model", "");
+                    formik.handleChange(e);
                   }}
-                  value={make || ""}
+                  value={formik.values.make || ""}
                 >
                   <option value="">-- Select Make --</option>
                   {Object.keys(Vehicles).map((make) => (
@@ -95,18 +73,20 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
                   ))}
                 </Form.Select>
               </FormGroup>
-              {make && (
+              {formik.values.make && (
                 <FormGroup>
                   <FormLabel>Select Model:</FormLabel>
                   <Form.Select
-                    as="select"
-                    onChange={(event) => {
-                      handleModelChange(event.target.value);
+                    name="model"
+                    className="form-control"
+                    onChange={(e) => {
+                      formik.setFieldValue("variant", "");
+                      formik.handleChange(e);
                     }}
-                    value={model || ""}
+                    value={formik.values.model || ""}
                   >
                     <option value="">-- Select Model --</option>
-                    {Object.keys(Vehicles[make]).map((model) => (
+                    {Object.keys(Vehicles[formik.values.make]).map((model) => (
                       <option key={model} value={model}>
                         {model}
                       </option>
@@ -114,22 +94,23 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
                   </Form.Select>
                 </FormGroup>
               )}
-              {model && (
+              {formik.values.model && formik.values.make && (
                 <FormGroup>
                   <FormLabel>Select Variant:</FormLabel>
                   <Form.Select
-                    as="select"
-                    onChange={(event) => {
-                      handleVariantChange(event.target.value);
-                    }}
-                    value={variant || ""}
+                    name="variant"
+                    className="form-control"
+                    onChange={formik.handleChange}
+                    value={formik.values.variant || ""}
                   >
                     <option value="">-- Select Variant --</option>
-                    {Vehicles[make || ""][model].map((variant : string) => (
-                      <option key={variant} value={variant}>
-                        {variant}
-                      </option>
-                    ))}
+                    {Vehicles[formik.values.make][formik.values.model].map(
+                      (variant: string) => (
+                        <option key={variant} value={variant}>
+                          {variant}
+                        </option>
+                      )
+                    )}
                   </Form.Select>
                 </FormGroup>
               )}
@@ -138,38 +119,25 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
           <Col>
             <VehicleSelector
               onClick1={() => {
-                handleMakeChange("tesla");
-                handleModelChange("Model 3");
-                handleVariantChange("Performance");
-                if (makeRef.current) {
-                  makeRef.current.value = "tesla";
-                }
-                if (modelRef.current) {
-                  modelRef.current.value = "Model 3";
-                }
-                if (variantRef.current) {
-                  variantRef.current.value = "Performance";
-                }
+                formik.setFieldValue("make", "tesla");
+                formik.setFieldValue("model", "Model 3");
+                formik.setFieldValue("variant", "Performance");
               }}
               onClick2={() => {
-                handleMakeChange("bmw");
-                handleModelChange("130d");
-                handleVariantChange("xDrive 26d");
-                if (makeRef.current) {
-                  makeRef.current.value = "bmw";
-                }
-                if (modelRef.current) {
-                  modelRef.current.value = "130d";
-                }
-                if (variantRef.current) {
-                  variantRef.current.value = "xDrive 26d";
-                }
+                formik.setFieldValue("make", "bmw");
+                formik.setFieldValue("model", "130d");
+                formik.setFieldValue("variant", "xDrive 26d");
               }}
             />
           </Col>
           <Col>
             {showUploadForm && (
-              <LogBookUploader onUpload={(file) => handleUpload(file)} />
+              <LogBookUploader
+                onUpload={(file) => {
+                  formik.setFieldValue("file", file);
+                  formik.submitForm();
+                }}
+              />
             )}
           </Col>
         </Row>
