@@ -1,28 +1,42 @@
 // components/VehicleSelectionForm.tsx
 "use client"; // This is a client component 👈🏽
 
-import React, { useEffect, useState } from "react";
-import LogBookUploader from './LogBookUploader'; // Import the LogBookUploader component
-
+import React, { useEffect, useRef, useState } from "react";
+import LogBookUploader from "./LogBookUploader"; // Import the LogBookUploader component
+import VehicleSelector from "./VehicleSelector";
+import {
+  Row,
+  Col,
+  FormGroup,
+  FormLabel,
+  Form,
+  FormControl,
+  Card,
+} from "react-bootstrap";
 
 const MODELS = {
   ford: {
-    Ranger: ['Raptor', 'Raptor x', 'Wildtrak'],
-    Falcon: ['XR6', 'XR6 Turbo', 'XR8'],
-    'Falcon Ute': ['XR6', 'XR6 Turbo'],
+    Ranger: ["Raptor", "Raptor x", "Wildtrak"],
+    Falcon: ["XR6", "XR6 Turbo", "XR8"],
+    "Falcon Ute": ["XR6", "XR6 Turbo"],
   },
   bmw: {
-    '130d': ['xDrive 26d', 'xDrive 30d'],
-    '240i': ['xDrive 30d', 'xDrive 50d'],
-    '320e': ['xDrive 75d', 'xDrive 80d', 'xDrive 85d'],
+    "130d": ["xDrive 26d", "xDrive 30d"],
+    "240i": ["xDrive 30d", "xDrive 50d"],
+    "320e": ["xDrive 75d", "xDrive 80d", "xDrive 85d"],
   },
   tesla: {
-    'Model 3': ['Performance', 'Long Range', 'Dual Motor'],
+    "Model 3": ["Performance", "Long Range", "Dual Motor"],
   },
 };
 
 interface VehicleSelectionFormProps {
-  onVehicleSelect: (make: string, model: string, variant: string, file: File | null) => void;
+  onVehicleSelect: (
+    make: string,
+    model: string,
+    variant: string,
+    file: File | null
+  ) => void;
 }
 
 const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
@@ -30,30 +44,33 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
 }) => {
   const [make, setMake] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
-  const [variant, setVariant] = useState<string | null>(null); 
+  const [variant, setVariant] = useState<string | null>(null);
   const [showUploadForm, setShowUploadForm] = useState<boolean>(false); // Added upload form visibility state
 
+  const makeRef = useRef<HTMLSelectElement | null>(null);
+  const modelRef = useRef<HTMLSelectElement | null>(null);
+  const variantRef = useRef<HTMLSelectElement | null>(null);
 
-  const handleMakeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setMake(event.target.value);
+  const handleMakeChange = (value: string) => {
+    setMake(value);
     setModel(null);
     setVariant(null);
     setShowUploadForm(false); // Hide upload form when make is changed
   };
 
-  const handleModelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setModel(event.target.value);
+  const handleModelChange = (value: string) => {
+    setModel(value);
     setVariant(null);
     setShowUploadForm(false); // Hide upload form when model is changed
   };
 
-  const handleVariantChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setVariant(event.target.value);
-    if (make && model && variant) { 
-      onVehicleSelect(make, model, variant, null); 
-    }  
+  const handleVariantChange = (value: string) => {
+    setVariant(value);
+    if (make && model && variant) {
+      onVehicleSelect(make, model, variant, null);
+    }
   };
-  
+
   const handleUpload = (file: File) => {
     if (make && model && variant && file) {
       onVehicleSelect(make, model, variant, file);
@@ -61,63 +78,118 @@ const VehicleSelectionForm: React.FC<VehicleSelectionFormProps> = ({
     }
   };
 
-  useEffect(()=> {
-    if (make && model && variant) { 
+  useEffect(() => {
+    if (make && model && variant) {
       setShowUploadForm(true); // Show upload form when all fields are filled up
-    } else { 
+    } else {
       setShowUploadForm(false);
     }
-  }, [make, model, variant])
+  }, [make, model, variant]);
 
   return (
-    <div>
-      <h2>Vehicle Selection Form</h2>
-      <div>
-        <label>Select Make:</label>
-        <select onChange={handleMakeChange}>
-          <option value="">-- Select Make --</option>
-          {Object.keys(MODELS).map((make) => (
-            <option key={make} value={make}>
-              {make}
-            </option>
-          ))}
-        </select>
-      </div>
-      {make && (
-        <div>
-          <label>Select Model:</label>
-          <select onChange={handleModelChange}>
-            <option value="">-- Select Model --</option>
-            {Object.keys(MODELS[make]).map((model) => (
-              <option key={model} value={model}>
-                {model}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-      {model && (
-        <div>
-          <label>Select Variant:</label>
-          <select onChange={handleVariantChange}>
-            <option value="">-- Select Variant --</option>
-            {MODELS[make][model].map((variant) => (
-              <option key={variant} value={variant}>
-                {variant}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-       <div style={{height: 100}}></div>
-
-      {showUploadForm && (
-        <LogBookUploader onUpload={(file) => handleUpload(file)} />
-      )}
-
-    </div>
-    
+    <Card>
+      <Card.Body>
+        <Row className="justify-content-md-center">
+          <Col>
+            <h2>Vehicle Selection Form</h2>
+            <Form>
+              <FormGroup>
+                <FormLabel>Select Make:</FormLabel>
+                <Form.Select
+                  as="select"
+                  onChange={(event) => {
+                    handleMakeChange(event.target.value);
+                  }}
+                  value={make}
+                >
+                  <option value="">-- Select Make --</option>
+                  {Object.keys(MODELS).map((make) => (
+                    <option key={make} value={make}>
+                      {make}
+                    </option>
+                  ))}
+                </Form.Select>
+              </FormGroup>
+              {make && (
+                <FormGroup>
+                  <FormLabel>Select Model:</FormLabel>
+                  <Form.Select
+                    as="select"
+                    onChange={(event) => {
+                      handleModelChange(event.target.value);
+                    }}
+                    value={model}
+                  >
+                    <option value="">-- Select Model --</option>
+                    {Object.keys(MODELS[make]).map((model) => (
+                      <option key={model} value={model}>
+                        {model}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </FormGroup>
+              )}
+              {model && (
+                <FormGroup>
+                  <FormLabel>Select Variant:</FormLabel>
+                  <Form.Select
+                    as="select"
+                    onChange={(event) => {
+                      handleVariantChange(event.target.value);
+                    }}
+                    value={variant}
+                  >
+                    <option value="">-- Select Variant --</option>
+                    {MODELS[make][model].map((variant) => (
+                      <option key={variant} value={variant}>
+                        {variant}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </FormGroup>
+              )}
+            </Form>
+          </Col>
+          <Col>
+            <VehicleSelector
+              onClick1={() => {
+                handleMakeChange("tesla");
+                handleModelChange("Model 3");
+                handleVariantChange("Performance");
+                if (makeRef.current) {
+                  makeRef.current.value = "tesla";
+                }
+                if (modelRef.current) {
+                  modelRef.current.value = "Model 3";
+                }
+                if (variantRef.current) {
+                  variantRef.current.value = "Performance";
+                }
+              }}
+              onClick2={() => {
+                handleMakeChange("bmw");
+                handleModelChange("130d");
+                handleVariantChange("xDrive 26d");
+                if (makeRef.current) {
+                  makeRef.current.value = "bmw";
+                }
+                if (modelRef.current) {
+                  modelRef.current.value = "130d";
+                }
+                if (variantRef.current) {
+                  variantRef.current.value = "xDrive 26d";
+                }
+              }}
+            />
+          </Col>
+          <Col>
+            {showUploadForm && (
+              <LogBookUploader onUpload={(file) => handleUpload(file)} />
+            )}
+          </Col>
+        </Row>
+      </Card.Body>
+    </Card>
   );
 };
 

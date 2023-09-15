@@ -1,5 +1,6 @@
 // components/LogBookUploader.tsx
 import React, { useState } from 'react';
+import { Form, Col, Button, ButtonGroup, Card } from "react-bootstrap";
 
 interface LogBookUploaderProps {
   onUpload: (file: File) => void;
@@ -23,13 +24,13 @@ const LogBookUploader: React.FC<LogBookUploaderProps> = ({ onUpload }) => {
 
   return (
     <div>
-      <h3>Log Book Uploader</h3>
+      <h2>Log Book Uploader</h2> 
+      <Form.Group controlId="formFile" className="mb-3">
+        <Form.Label>Select File</Form.Label>
+        <Form.Control type="file" accept=".txt" onChange={handleFileChange}/>
+      </Form.Group>
       <div>
-        <label>Select File:</label>
-        <input type="file" accept=".pdf,.jpg,.png,.txt" onChange={handleFileChange} />
-      </div>
-      <div>
-        <button onClick={handleUpload}>Upload</button>
+        <Button onClick={handleUpload}>Upload</Button>
       </div>
     </div>
   );

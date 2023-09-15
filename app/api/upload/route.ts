@@ -11,5 +11,5 @@ export async function POST (request: NextRequest) {
     );
   } 
   const buffer = Buffer.from(await file.arrayBuffer()); 
-  return NextResponse.json({ body:JSON.stringify(body), file: buffer.toString("utf8"), success: true });
+  return NextResponse.json({ body: body, file: buffer.toString("utf8"), success: true });
 }; 
