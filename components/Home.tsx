@@ -4,20 +4,7 @@ import React, {useEffect, useState} from 'react';
 import VehicleSelectionForm from '../components/VehicleSelectionForm';
 import { redirect } from 'next/navigation'
 import { Container } from 'react-bootstrap';
-
-const ResultDetail = (result) => { 
-    const data = result.result.body 
-    return (
-      <div style={{marginTop: 20}}>
-        <h1>Vehicle</h1> 
-        <div>Make: {data.make}</div>
-        <div>Model: {data.model}</div>
-        <div>Variant: {data.variant}</div>
-        <h1>Log Book</h1> 
-        <div>File: { result.result.file}</div>
-      </div>
-    )
-}
+import VehicleDetail from './VehicleDetail';
 
 const Home: React.FC = () => {
   const [result, setResult] = useState(null)
@@ -58,7 +45,7 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     if(result) {
-        redirect("/upload") 
+        // redirect("/upload") 
     }
   }, [result])
 
@@ -66,7 +53,7 @@ const Home: React.FC = () => {
     <Container >
          <VehicleSelectionForm onVehicleSelect={handleVehicleSelect} />
 
-        {result && <ResultDetail result={result}/>}
+        {result && <VehicleDetail result={result}/>}
     </Container>
   );
 };
