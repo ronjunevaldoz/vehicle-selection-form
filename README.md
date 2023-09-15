@@ -1,3 +1,11 @@
+## Vehicle Selector Form 
+
+## Exam notes for improvement (Ron June Valdoz)
+- use [Formik](https://formik.org/) for better validation
+- use [Redux toolkit](https://redux-toolkit.js.org/) for better readability & maintenance 
+- use `MongoDB` & `GraphQL` for database
+## ---------------------------------------------------------------------
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
