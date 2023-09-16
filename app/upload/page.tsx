@@ -1,11 +1,11 @@
 "use client";
+// `app/upload/page.tsx` is the UI for the `/upload` URL
 
 import VehicleDetail from "@/components/VehicleDetail";
 import { useSearchParams } from "next/navigation";
 import React from "react";
 
-
-const Upload: React.FC = () => {
+export default function Page() {
   const searchParams = useSearchParams()!;
   const make = searchParams.get("make");
   const model = searchParams.get("model");
@@ -20,6 +20,4 @@ const Upload: React.FC = () => {
   };
 
   return <VehicleDetail vehicle={vehicleData} />;
-};
-
-export default Upload;
+}
